@@ -12,29 +12,35 @@ app = FastAPI()
 # Dictionary to store keys
 keys = {}
 
+
 # Request Body Models
 class KeyRequest(BaseModel):
     key_type: str
     key_size: int
+
 
 class EncryptRequest(BaseModel):
     key_id: str
     plaintext: str
     algorithm: str
 
+
 class DecryptRequest(BaseModel):
     key_id: str
     ciphertext: str
     algorithm: str
 
+
 class HashRequest(BaseModel):
     data: str
     algorithm: str
+
 
 class VerifyHashRequest(BaseModel):
     data: str
     hash_value: str
     algorithm: str
+
 
 # Generate Key API
 @app.post("/generate-key")
@@ -60,6 +66,7 @@ async def generate_key(request: KeyRequest):
     keys[key_id] = key  # Store the key in memory
     return {"key_id": key_id, "key_value": key_value}
 
+
 # Encryption API
 @app.post("/encrypt")
 async def encrypt(request: EncryptRequest):
@@ -75,7 +82,7 @@ async def encrypt(request: EncryptRequest):
         padded_plaintext = padder.update(request.plaintext.encode()) + padder.finalize()
         ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize()
         return {"ciphertext": base64.b64encode(iv + ciphertext).decode()}
-    
+
     elif request.algorithm.upper() == "RSA":
         if not isinstance(key, rsa.RSAPrivateKey):
             raise HTTPException(status_code=400, detail="Key is not RSA type")
@@ -89,9 +96,10 @@ async def encrypt(request: EncryptRequest):
             )
         )
         return {"ciphertext": base64.b64encode(ciphertext).decode()}
-    
+
     else:
         raise HTTPException(status_code=400, detail="Unsupported algorithm")
+
 
 # Decryption API
 @app.post("/decrypt")
@@ -109,7 +117,7 @@ async def decrypt(request: DecryptRequest):
         unpadder = padding.PKCS7(128).unpadder()
         plaintext = unpadder.update(decrypted_text) + unpadder.finalize()
         return {"plaintext": plaintext.decode()}
-    
+
     elif request.algorithm.upper() == "RSA":
         if not isinstance(key, rsa.RSAPrivateKey):
             raise HTTPException(status_code=400, detail="Key is not RSA type")
@@ -123,9 +131,10 @@ async def decrypt(request: DecryptRequest):
             )
         )
         return {"plaintext": plaintext.decode()}
-    
+
     else:
         raise HTTPException(status_code=400, detail="Unsupported algorithm")
+
 
 # Hash Generation API
 @app.post("/generate-hash")
@@ -140,6 +149,7 @@ async def generate_hash(request: HashRequest):
     digest.update(request.data.encode())
     hash_value = digest.finalize()
     return {"hash_value": base64.b64encode(hash_value).decode(), "algorithm": request.algorithm}
+
 
 # Hash Verification API
 @app.post("/verify-hash")
