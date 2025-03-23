@@ -217,7 +217,7 @@ You can test these endpoints using Postman. Use the raw JSON provided above for 
 
 You can also test these endpoints using the following URL: https://en4720-milestone-2-cryptographic-api.onrender.com/docs
 
-## Deployment
+<!-- ## Deployment
 
 To deploy this API publicly (for example, on Heroku), follow these steps:
 
